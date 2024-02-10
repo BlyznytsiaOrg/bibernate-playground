@@ -1,328 +1,191 @@
-# Bring Framework Playground
+# Bibernate Framework Playground
 
 ## Getting Started
 
-Demo features:
- - List injection
- - PostConstruct
- - SingletonBean and PrototypeBean
- - Properties injection via Value
- - ScheduledTask
- - Configuration (Bean), Service annotation usage
- - Qualifier
- - Embedded Server Tomcat 
- - Dispatcher Servlet
- - REST API
- - Static Content Serving
- - Exception handler
- - Actuator
- - Banner
+# Demo features:
+
+ - Annotation check during compile face
+ - Schema Generation
 
 Please take into account that this is not a full supported features it is just for demo set. 
-If you need more please take to look into example of repo [bring](https://github.com/BlyznytsiaOrg/bring).
+If you need more please take to look into example of repo [bibernate](https://github.com/BlyznytsiaOrg/bibernate).
+
+## Prerequisites
+
+Before getting started with Bibernate, ensure you have the following prerequisites installed:
+
+- Java 17
+- Your preferred Java IDE such as IntelliJ IDEA
+- Docker or PostgreSQL
 
 ## Usage
 
-To run the `bring Playground` application:
+To run the `Bibernate Playground` application:
+
+- Clone repo
+```bash
+   git clone git@github.com:BlyznytsiaOrg/bibernate.git
+```  
+- 2. Run docker-compose to start the PostgreSQL or skip if you have local one.
 
 ```bash
-   git clone https://github.com/YevgenDemoTestOrganization/bring-playground.git
-```  
+   cd docker 
+   docker-compose up -d
+```
 
-and run the 
+- Run demo application
 
 ```
-com.levik.bringplayground.BringPlaygroundApplication
+com.levik.bibernate.demo.BibernateDDLDemoApplication
 ```  
 
 ## Let's go feature by feature
 
-- List Injection Overview
+- annotation check during compile face
+
+Imagine you've recently started learning Hibernate, but you've forgotten to include a crucial annotation in one of your entity classes. 
+Time is of the essence, so it's vital to identify and resolve any errors quickly. 
+Due to our focus on efficiency, encountering compile errors in this scenario is expected.
+
+We have simple entity, but we forget to add @Id annotation.
 
 ```java
-import io.github.blyznytsiaorg.bring.core.annotation.Autowired;
-import io.github.blyznytsiaorg.bring.core.annotation.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-@Service
-public class Barista {
-    private final List<Drink> drinks;
-    
-    public Barista(List<Drink> drinks) {
-        this.drinks = drinks;
-    }
-
-```
-
-List injection, a feature in Bring, involves the injection of a collection of objects into a class or component. 
-In our project, the Barista class is a prime example that demonstrates this functionality.
-Go to class Barista. Within this example, the Barista class receives a list of Drink instances via its constructor. 
-These instances might be defined elsewhere in the project, and Bring automatically handles their injection into the Barista class upon initialization.
-
-See the result of the logs:
-
-```
-[INFO ] 23-12-01 14:43:39.838 [main] c.l.b.BringPlaygroundApplication - bring - Barista is Barista is preparing a drink: Brewing a strong espresso!, Making a delicious latte!
-```
-
-- PostConstruct
-
-```java
-
-    @PostConstruct
-    public void onInit() {
-        log.info("PostContract demo!!!");
-    }
-```
-
-- SingletonBean and PrototypeBean
-
-```java
-
-import io.github.blyznytsiaorg.bring.core.annotation.Component;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@AllArgsConstructor
-@Component
-public class SingletonBean {
-
-    @Getter
-    private final PrototypeBean prototypeBean;
-
-}
-
-import io.github.blyznytsiaorg.bring.core.annotation.Scope;
-import io.github.blyznytsiaorg.bring.core.annotation.Service;
-import io.github.blyznytsiaorg.bring.core.domain.BeanScope;
-import io.github.blyznytsiaorg.bring.core.domain.ProxyMode;
-
-@Service
-@Scope(name = BeanScope.PROTOTYPE, proxyMode = ProxyMode.ON)
-public class PrototypeBean {
-}
-
-
-  private final SingletonBean singletonBean;
-  @ScheduledTask(value = "myTask", initialDelay = 1, period = 20, timeUnit = TimeUnit.SECONDS)
-  public void scheduledMethod1() {
-    log.info(Thread.currentThread().getName() + " scheduledMethod1 " + LocalDateTime.now());
-
-    log.info("singletonBean -> " + singletonBean + " PrototypeBean ->" + singletonBean.getPrototypeBean());
-  }
-}
-
-```
-
-and from logs we could see that Prototype Bean has different identity
-
-```
-[INFO ] 23-12-01 20:41:11.969 [pool-1-thread-1] c.l.b.feature.di.MyScheduledTasks - bring - pool-1-thread-1 scheduledMethod1 2023-12-01T20:41:11.969047
-[INFO ] 23-12-01 20:41:11.969 [pool-1-thread-1] c.l.b.feature.di.MyScheduledTasks - bring - singletonBean -> com.levik.bringplayground.feature.di.SingletonBean@365695eb PrototypeBean ->com.levik.bringplayground.feature.di.PrototypeBean@1dcd751f
-[INFO ] 23-12-01 20:41:31.974 [pool-1-thread-1] c.l.b.feature.di.MyScheduledTasks - bring - pool-1-thread-1 scheduledMethod1 2023-12-01T20:41:31.974337
-[INFO ] 23-12-01 20:41:31.975 [pool-1-thread-1] c.l.b.feature.di.MyScheduledTasks - bring - singletonBean -> com.levik.bringplayground.feature.di.SingletonBean@365695eb PrototypeBean ->com.levik.bringplayground.feature.di.PrototypeBean@740d3425
-```
-
-- Properties injection via Value
-
-We have default values that come to start the tomcat for instance server.port etc. If you want you could override them and use your port of use default.
-
-But else you could create you class to consumer you properties for instance ShortenProperties it has serverUrl
-
-```java
-import io.github.blyznytsiaorg.bring.core.annotation.Component;
-import io.github.blyznytsiaorg.bring.core.annotation.Value;
+import io.github.blyznytsiaorg.bibernate.annotation.Entity;
+import io.github.blyznytsiaorg.bibernate.annotation.Table;
 import lombok.Data;
 
 @Data
-@Component
-public class ShortenProperties {
+@Entity
+@Table(name = "persons")
+public class Person {
+    private Long id;
 
-    @Value("shortenServerUrl")
-    private String serverUrl;
+    private String firstName;
+
+    private String lastName;
 }
-```  
-
-application.properties
-
-```
-shortenServerUrl = http://localhost:9000/short/
 ```
 
-- ScheduledTask
+In this scenario, you'll encounter compile errors that come with clear instructions on how to resolve them. Isn't that convenient?
+Isn't that convenient?
+
+<img width="1300" alt="image" src="https://github.com/BlyznytsiaOrg/bring/assets/73576438/b35b7a12-7403-4ef7-b768-de43dfe26ed5">
+
+We have many more check please refer [bibernate annotation check]()
+
+- Schema Generation (Offers tools for generating database schemas based on entity mappings, simplifying database setup and migration.)
+
+To enable this feature in Bibernate, you need to create a hibernate.properties file with the following configuration settings.
+
+```bash
+bibernate.2ddl.auto=create
+```
 
 
-This code defines a class MyScheduledTasks that contains a method scheduledMethod1(), annotated as a scheduled task. 
-This method is set to run periodically with a specific initial delay and time period. 
-When executed, it logs information using the logger just for demo purpose.
+Example of the code with one entity and save ang get operation
+
 ```java
-import io.github.blyznytsiaorg.bring.core.annotation.Component;
-import io.github.blyznytsiaorg.bring.core.annotation.ScheduledTask;
+import com.levik.bibernate.demo.entity.Person;
+import io.github.blyznytsiaorg.bibernate.Persistent;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
-import java.util.concurrent.TimeUnit;
-
 @Slf4j
-@Component
-public class MyScheduledTasks {
-    @ScheduledTask(value = "myTask", initialDelay = 1, period = 20, timeUnit = TimeUnit.SECONDS)
-    public void scheduledMethod1() {
-        log.info(Thread.currentThread().getName() + " scheduledMethod1 " + LocalDateTime.now());
-    }
-}
-```
+public class BibernateDDLDemoApplication {
+    public static final String ENTITY_PACKAGE = "com.levik.bibernate.demo.entity";
 
-log result:
+    public static void main(String[] args) {
+        log.info("Bibernate Demo Application...");
+        var persistent = Persistent.withDefaultConfiguration(ENTITY_PACKAGE);
 
-```
-[INFO ] 23-12-01 15:10:21.241 [pool-1-thread-1] c.l.b.feature.di.MyScheduledTasks - bring - pool-1-thread-1 scheduledMethod1 2023-12-01T15:10:21.241206
-[INFO ] 23-12-01 15:10:41.242 [pool-1-thread-1] c.l.b.feature.di.MyScheduledTasks - bring - pool-1-thread-1 scheduledMethod1 2023-12-01T15:10:41.242068
-```
+        try(var bibernateEntityManager = persistent.createBibernateEntityManager()) {
 
-- Configuration (Bean), Service annotation usage
+            try (var bibernateSessionFactory = bibernateEntityManager.getBibernateSessionFactory()) {
+                try (var bibernateSession = bibernateSessionFactory.openSession()){
+                    var person = new Person();
+                    person.setId(1L);
+                    person.setLastName("Ivan");
+                    person.setFirstName("Petrovich");
 
-Within our project, we have the flexibility to configure classes using annotations such as @Component or @Service,
-enabling them to be recognized as Bring-managed components automatically. Additionally, we can create a separate configuration class,
-annotate it with @Configuration, and employ the @Bean annotation on its methods.
+                    bibernateSession.save(Person.class, person);
+                    
+                    Person personFromDb = bibernateSession.findById(Person.class, 1L).orElseThrow();
 
-```java
-import io.github.blyznytsiaorg.bring.core.annotation.Service;
-
-
-@Service
-public class Md5HashGenerator implements HashGenerator {
-    ...
-}
-```
-
-
-```java
-import io.github.blyznytsiaorg.bring.core.annotation.Bean;
-import io.github.blyznytsiaorg.bring.core.annotation.Configuration;
-
-@Configuration
-public class MyConfiguration {
-
-    @Bean
-    public HashGenerator incrementHashGenerator() {
-        return new IncrementHashGenerator();
-    }
-}
-```
-
-- Qualifier
-
-We need two classes for hash generation: one for testing and another for production. To ensure functionality, we require a Qualifier or a name that can be resolved by its name.
-
-```java
-    private final HashGenerator hashGenerator;
-
-    public ShortenService(ShortenProperties shortenProperties,
-                          @Qualifier("md5HashGenerator") HashGenerator hashGenerator) {
-        ...
+                    log.info("Person from DB " + personFromDb);
+                }
+            }
         }
-
-```
-
-- Embedded Server Tomcat, Dispatcher Servlet, Rest API, Web annotations like PostMapping, ResponseEntity, RequestBody etc.
-
-
-To simplify and expedite our web development process, it would be beneficial to incorporate an embedded Tomcat that encompasses all the essential functionalities for developing and resetting APIs seamlessly.
-
-```java
-public class ShortenController implements BringServlet {
-
-    private static final String LOCATION = "location";
-    private final ShortenService shortenService;
-
-    @SneakyThrows
-    @PostMapping(path = "/api/shorten")
-    public ResponseEntity<UserResponse> createShortUrl(@RequestBody UserRequest userRequest) {
-        String shortUrl = shortenService.createShortUrl(userRequest.getOriginalUrl());
-        return new ResponseEntity<>(new UserResponse(shortUrl), HttpStatus.OK);
-    }
-
-    @SneakyThrows
-    @GetMapping(path = "/short/{hash}")
-    public ResponseEntity<Void> getLongUrl(@PathVariable String hash) {
-        String longUrl = shortenService.resolveHash(hash);
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set(LOCATION, longUrl);
-
-        return new ResponseEntity<>(httpHeaders, HttpStatus.MOVED_PERMANENTLY);
-    }
-}
-
-```
-
-- Static Content Serving
-
-Typically, we require serving static content such as HTML, CSS, and JS files on a server. 
-With Bring, you can automate this process using out of the box, allowing for seamless hosting and browsing of these files
-
-![Bring DI diagram](https://github.com/YevgenDemoTestOrganization/bring/assets/73576438/289a774e-dce4-4057-8506-ecaefb2a2ec3)
-
-UI
-
-<img width="1434" alt="image" src="https://github.com/YevgenDemoTestOrganization/bring/assets/73576438/4f8e9696-9b63-4ff6-a890-0bfa5edad3d6">
-
-- Exception handler
-  ![Bring DI diagram](https://github.com/YevgenDemoTestOrganization/bring/assets/73576438/f18327da-bfb3-4e73-b93e-3208229462e8)
-
-  - Custom exception
-```java
-import io.github.blyznytsiaorg.bring.web.servlet.annotation.ResponseStatus;
-
-@ResponseStatus(value = HttpStatus.NOT_FOUND)
-public class HashNotFoundException extends RuntimeException {
-
-    public HashNotFoundException(String message) {
-        super(message);
     }
 }
 ```
 
+The default logging level in Hibernate is INFO. To enable a lower level of logging, use a logback.xml configuration file.
+Here's an example of configuring trace logging:
 
-- Actuator
+```bash
+<configuration>
 
-We offer support for health checks, info retrieval, environment details, and logging functionalities. 
-Our standout feature allows changing log levels in real-time without the need for system restarts, 
-facilitated through a dedicated API.
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
 
-```java
-    /**
-     * Endpoint for dynamically changing the log level of specific loggers based on package name.
-     *
-     * @param packageName The name of the logger's package to change the level.
-     * @param newLevel    The new log level for the specified logger's package.
-     */
-    @PostMapping(path = "/loggers")
-    public void logger(@RequestParam String packageName, @RequestParam String newLevel) {
-        LogLevelChangerUtils.changeLogLevel(packageName, newLevel);
-    }
+    <logger name="io.github.blyznytsiaorg.bibernate" level="${io.github.blyznytsiaorg.bibernate.log.level:-TRACE}"/>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>
 ```
 
-- The last one Banner
+I'd like to highlight a few useful items in the logs.
+
+- We utilize the EntityMetadataCollector class to gather all entities using reflection, and subsequently utilize the collected data. 
+Then print the number of entities found. If you don't have any entities you will see and errors.
+
+```bash
+15:56:42.588 [main] TRACE i.g.b.b.e.m.EntityMetadataCollector - Found entities size 0
+Exception in thread "main" io.github.blyznytsiaorg.bibernate.exception.EntitiesNotFoundException: Cannot find any entities on classpath with this package com.levik.bibernate.demo.entity
+at io.github.blyznytsiaorg.bibernate.entity.metadata.EntityMetadataCollector.collectMetadata(EntityMetadataCollector.java:80)
+at io.github.blyznytsiaorg.bibernate.Persistent.<init>(Persistent.java:93)
+at io.github.blyznytsiaorg.bibernate.Persistent.withDefaultConfiguration(Persistent.java:44)
+at com.levik.bibernate.demo.BibernateDDLDemoApplication.main(BibernateDDLDemoApplication.java:13)
+```
+
+- DDL operation. If you're new to DDL (Data Definition Language), you could write some entities and learn DDL syntax.
+
+```bash
+15:40:56.608 [main] DEBUG i.g.b.bibernate.ddl.DDLProcessor - Bibernate: create table persons (id bigint primary key, first_name varchar(255), last_name varchar(255))
+```
+
+This is the main part. If you require further information, please feel free to refer to the logs. Bibernate strives to guide you through any issues encountered.
+
+```bash
+15:40:56.575 [main] TRACE i.g.b.b.e.m.EntityMetadataCollector - Found entities size 1
+15:40:56.588 [main] DEBUG i.g.b.bibernate.ddl.DDLProcessor - Bibernate: drop table if exists persons cascade
+15:40:56.608 [main] DEBUG i.g.b.bibernate.ddl.DDLProcessor - Bibernate: create table persons (id bigint primary key, first_name varchar(255), last_name varchar(255))
+15:40:56.635 [main] TRACE i.g.b.bibernate.dao.EntityDao - Save entity clazz Person
+15:40:56.636 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Entity Person not found in firstLevel cache by id 1
+15:40:56.650 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Created snapshot for entity Person id 1
+15:40:56.650 [main] INFO  c.l.b.demo.BibernateDemoApplication - Person from DB Person(id=1, firstName=Petrovich, lastName=Ivan)
+```
 
 
-  if you want you could use the default one add your own or disable it. 
-  Let's try with new one:
- - add banner.txt to resources
- - add VM options add bring.main.banner.file
-
-<img width="1272" alt="image" src="https://github.com/YevgenDemoTestOrganization/bring/assets/73576438/87af8f33-00d5-43a8-9872-2de678598b77">
-
-logs from application:
-
-<img width="1688" alt="image" src="https://github.com/YevgenDemoTestOrganization/bring/assets/73576438/2c231fa9-ed34-4aca-8d1f-98c54d94431b">
 
 
-Furthermore, Bring accommodates a plethora of additional features.:
-- [Core](https://github.com/YevgenDemoTestOrganization/bring/blob/main/features/Core.md)
-- [Web](https://github.com/YevgenDemoTestOrganization/bring/blob/main/features/Web.md)
+
+
+
+
+
+
+
+
+
+
+
+Furthermore, Biberate accommodates a plethora of additional features.:
+
 
 

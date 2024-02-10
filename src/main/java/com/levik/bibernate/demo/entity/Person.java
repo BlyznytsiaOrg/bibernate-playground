@@ -1,27 +1,18 @@
-package demo.entity;
+package com.levik.bibernate.demo.entity;
 
-import bibernate.annotation.Column;
-import bibernate.annotation.Id;
-import bibernate.annotation.OneToMany;
-import bibernate.annotation.Table;
+import io.github.blyznytsiaorg.bibernate.annotation.Entity;
+import io.github.blyznytsiaorg.bibernate.annotation.Id;
+import io.github.blyznytsiaorg.bibernate.annotation.Table;
 import lombok.Data;
-import lombok.ToString;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
-@ToString(exclude = "notes")
-@Table("persons")
+@Entity
+@Table(name = "persons")
 public class Person {
     @Id
     private Long id;
 
-    @Column("first_name")
     private String firstName;
 
-    @Column("last_name")
     private String lastName;
-    @OneToMany
-    private List<Note> notes = new ArrayList<>();
 }
