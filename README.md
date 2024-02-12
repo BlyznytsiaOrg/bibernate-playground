@@ -4,8 +4,9 @@
 
 # Demo features:
 
- - Annotation check during compile face
- - Schema Generation
+ - **Annotation check during compile face**
+ - **Schema Generation**
+ - **Automatic Persistence and optimization**
 
 Please take into account that this is not a full supported features it is just for demo set. 
 If you need more please take to look into example of repo [bibernate](https://github.com/BlyznytsiaOrg/bibernate).
@@ -41,7 +42,7 @@ com.levik.bibernate.demo.BibernateDDLDemoApplication
 
 ## Let's go feature by feature
 
-- annotation check during compile face
+- **annotation check during compile face**
 
 Imagine you've recently started learning Hibernate, but you've forgotten to include a crucial annotation in one of your entity classes. 
 Time is of the essence, so it's vital to identify and resolve any errors quickly. 
@@ -73,7 +74,7 @@ Isn't that convenient?
 
 We have many more check please refer [bibernate annotation check]()
 
-- Schema Generation (Offers tools for generating database schemas based on entity mappings, simplifying database setup and migration.)
+- **Schema Generation** (Offers tools for generating database schemas based on entity mappings, simplifying database setup and migration.)
 
 To enable this feature in Bibernate, you need to create a hibernate.properties file with the following configuration settings.
 
@@ -171,6 +172,67 @@ This is the main part. If you require further information, please feel free to r
 15:40:56.650 [main] INFO  c.l.b.demo.BibernateDemoApplication - Person from DB Person(id=1, firstName=Petrovich, lastName=Ivan)
 ```
 
+We have more complex example with all relation. go to test.
+
+
+- **Automatic Persistence and optimization**
+
+Automatically manages the lifecycle of persistent objects by tracking changes and synchronizing them with the database. 
+An optimization feature is also implemented, where it analyzes all actions performed within a session and optimizes them. 
+
+For instance
+
+1. you create a new Person -> save it
+2. update it with a new name -> update
+3. and delete it.
+
+Bibernate will intelligently analyze these actions and execute only the final action, which is the delete operation. 
+This optimization enhances efficiency and streamlines database interactions.
+
+
+```java
+public class ActionQueueOptimizationDemoApplication {
+
+    public static final String ENTITY_PACKAGE = "com.levik.bibernate.demo.entity";
+
+    public static void main(String[] args) {
+        var persistent = Persistent.withDefaultConfiguration(ENTITY_PACKAGE);
+        try(var bibernateEntityManager = persistent.createBibernateEntityManager()) {
+
+            try (var bibernateSessionFactory = bibernateEntityManager.getBibernateSessionFactory()) {
+                try (var bibernateSession = bibernateSessionFactory.openSession()){
+                    var person = new Person();
+                    person.setId(2L);
+                    person.setFirstName("Rake");
+                    person.setLastName("Tell");
+
+                    //when
+                    bibernateSession.save(Person.class, person);
+
+                    person.setFirstName("New Rake");
+                    bibernateSession.update(Person.class, person);
+
+                    bibernateSession.delete(Person.class, person);
+                    bibernateSession.flush();
+                }
+            }
+        }
+    }
+}
+```
+
+logs result and we have just delete query. This optimization significantly reduces database overhead and enhances performance.
+
+```bash
+23:24:32.040 [main] DEBUG i.g.b.bibernate.dao.EntityDao - Query DELETE FROM persons WHERE id = ?; bindValue id=2
+23:24:32.050 [main] TRACE i.g.b.bibernate.dao.EntityDao - Delete entity Person with id=2
+```
+
+If you need more detailed examples and cases regarding the behavior of the action queue and session optimization, 
+you can refer to either the ActionQueueTest within our test suite or the official documentation. 
+The test cases in ActionQueueTest cover various scenarios and edge cases, providing insights into how the action 
+queue behaves under different conditions. Additionally, the documentation should offer explanations and examples to 
+help you understand how the session optimization feature works and how to utilize it effectively in your applications.
 
 
 
