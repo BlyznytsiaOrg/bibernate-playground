@@ -27,7 +27,7 @@ To run the `Bibernate Playground` application:
 ```bash
    git clone git@github.com:BlyznytsiaOrg/bibernate.git
 ```  
-- 2. Run docker-compose to start the PostgreSQL or skip if you have local one.
+- 2. Run docker-compose to start the PostgreSQL or skip if you have local one (db.url=jdbc:postgresql://localhost:5432/db).
 
 ```bash
    cd docker 
