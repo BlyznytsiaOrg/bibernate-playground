@@ -1,13 +1,13 @@
 package com.levik.bibernate.demo;
 
-import com.levik.bibernate.demo.entity.Person;
+import com.levik.bibernate.demo.actionqueue.Person;
 import io.github.blyznytsiaorg.bibernate.Persistent;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ActionQueueOptimizationDemoApplication {
 
-    public static final String ENTITY_PACKAGE = "com.levik.bibernate.demo.entity";
+    public static final String ENTITY_PACKAGE = "com.levik.bibernate.demo.actionqueue";
 
     public static void main(String[] args) {
         var persistent = Persistent.withDefaultConfiguration(ENTITY_PACKAGE);

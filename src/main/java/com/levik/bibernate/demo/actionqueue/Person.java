@@ -1,4 +1,4 @@
-package com.levik.bibernate.demo.entity;
+package com.levik.bibernate.demo.actionqueue;
 
 import io.github.blyznytsiaorg.bibernate.annotation.Entity;
 import io.github.blyznytsiaorg.bibernate.annotation.Id;
