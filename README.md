@@ -8,6 +8,7 @@
  - **Schema Generation**
  - **Automatic Persistence and optimization**
  - **Transaction Management**
+ - **Relations**
 
 Please take into account that this is not a full supported features it is just for demo set. 
 If you need more please take to look into example of repo [bibernate](https://github.com/BlyznytsiaOrg/bibernate).
@@ -325,9 +326,226 @@ help you understand how the session optimization feature works and how to utiliz
 
 - **Transaction Management**
 
+Offers built-in support for managing database transactions, ensuring data integrity and consistency across multiple operations.
+
+We have a simple Entity with ID -> Identity
+
+@Entity: This annotation marks the class as an entity, indicating that it will be mapped to a database table. In this case, the Person class represents a table named "persons" in the database.
+@Table(name = "persons"): This annotation specifies the name of the database table to which the entity is mapped. In this case, the Person class will be mapped to a table named "persons".
+
+@Id: This annotation marks the field that represents the primary key of the entity. In this case, the id field is the primary key.
+
+@GeneratedValue(strategy = GenerationType.IDENTITY): This annotation specifies the generation strategy for the primary key values. IDENTITY indicates that the database will automatically generate unique primary key values. This is typically used with databases that support auto-increment columns.
+
+@Column(name = "column_name"): This annotation specifies the mapping of the entity's field to the corresponding column in the database table. It allows you to customize the column name if it differs from the field name. In this case, firstName and lastName fields are mapped to columns named "first_name" and "last_name" in the "persons" table, respectively.
 
 
+```java
+@Entity
+@Table(name = "persons")
+@ToString
+@Setter
+@Getter
+public class Person {
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
+    @Column(name = "id")
+    private Long id;
 
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+}
+```
+
+Demo application for this 
+
+
+```java
+@Slf4j
+public class BibernateTransactionDemoApplication {
+
+    public static final String ENTITY_PACKAGE = "com.levik.bibernate.demo.transaction";
+
+    @SneakyThrows
+    public static void main(String[] args) {
+        log.info("Bibernate Demo Application...");
+        Persistent persistent = Persistent.withDefaultConfiguration(ENTITY_PACKAGE);
+
+        try (var bibernateEntityManager = persistent.createBibernateEntityManager()) {
+            var bibernateSessionFactory = bibernateEntityManager.getBibernateSessionFactory();
+            try (var bibernateSession = bibernateSessionFactory.openSession()) {
+                bibernateSession.startTransaction();
+                var person = new Person();
+                person.setFirstName("John");
+                person.setLastName("Smith");
+                bibernateSession.save(Person.class, person);
+                bibernateSession.commitTransaction();
+            }
+
+            try (var bibernateSession = bibernateSessionFactory.openSession()) {
+                bibernateSession.startTransaction();
+                var person = new Person();
+                person.setFirstName("Yevgen");
+                person.setLastName("P");
+
+                bibernateSession.rollbackTransaction();
+            }
+
+            try (var bibernateSession = bibernateSessionFactory.openSession()) {
+                List<Person> all = bibernateSession.findAll(Person.class);
+                all.stream().forEach(person -> log.info("Peson {}", person));
+            }
+        }
+    }
+}
+```
+
+result of the program output
+
+
+```bash
+21:26:19.513 [main] TRACE i.g.b.b.e.m.EntityMetadataCollector - Found entities size 1
+21:26:19.525 [main] DEBUG i.g.b.bibernate.ddl.DDLProcessor - Bibernate: drop table if exists persons cascade
+21:26:19.536 [main] DEBUG i.g.b.bibernate.ddl.DDLProcessor - Bibernate: create table persons (id bigserial primary key, first_name varchar(255), last_name varchar(255))
+21:26:19.554 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Session is closing. Performing dirty checking...
+21:26:19.557 [main] DEBUG i.g.b.b.d.j.i.IdentityIdGenerator - Query INSERT INTO persons ( first_name, last_name ) VALUES ( ?, ? );
+21:26:19.566 [main] TRACE i.g.b.bibernate.dao.EntityDao - Save entity clazz Person
+21:26:19.566 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - FirstLevelCache is clearing...
+21:26:19.566 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Snapshots are clearing...
+21:26:19.566 [main] TRACE i.g.b.b.s.DefaultBibernateSession - Close session...
+21:26:19.567 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Session is closing. Performing dirty checking...
+21:26:19.567 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - FirstLevelCache is clearing...
+21:26:19.567 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Snapshots are clearing...
+21:26:19.567 [main] TRACE i.g.b.b.s.DefaultBibernateSession - Close session...
+21:26:19.567 [main] DEBUG i.g.b.bibernate.dao.EntityDao - Query SELECT * FROM persons;
+21:26:19.577 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Created snapshot for entity Person id 1
+21:26:19.578 [main] INFO  c.l.b.d.BibernateTransactionDemoApplication - Peson Person(id=1, firstName=John, lastName=Smith)
+21:26:19.578 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Session is closing. Performing dirty checking...
+```
+
+After reviewing the output, we observe that only one insertion into the 'person' table occurred, which aligns with expectations since the second operation was rolled back. Consequently, when querying with 'findAll', only one entity with the 'firstName' attribute set to 'John' is retrieved.
+
+
+- **Relations**
+
+Let's delve into configuring a many-to-many relationship between two entities, namely Person and Course.
+
+
+```java
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString(exclude = {"notes", "courses"})
+@Data
+@Entity
+@Table(name = "persons")
+public class Person {
+    
+    @Id
+    @GeneratedValue
+    private Long id;
+    
+    private String firstName;
+    
+    private String lastName;
+
+    @OneToMany(mappedBy = "person")
+    private List<Note> notes = new ArrayList<>();
+    
+    @ManyToMany
+    @JoinTable(name = "persons_courses", // join table annotation is in the owning side (Person)
+        joinColumn = @JoinColumn(name = "person_id"),
+        inverseJoinColumn = @JoinColumn(name = "course_id"))
+    private List<Course> courses = new ArrayList<>();
+
+    @OneToOne
+    @JoinColumn(name = "person_address_id")
+    private Address address;
+    
+}
+```
+
+
+```java
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Entity
+@Table(name = "courses")
+public class Course {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
+    
+    private String name;
+    
+    @ManyToMany(mappedBy = "courses")
+    private List<Person> persons = new ArrayList<>();
+    
+    @ManyToOne
+    private Author author;
+    
+}
+```
+
+The demo application looks like this 
+
+
+```java
+@Slf4j
+public class ManyToManyDemoApplication {
+
+    public static final String ENTITY_PACKAGE = "com.levik.bibernate.demo.relations";
+
+    @SneakyThrows
+    public static void main(String[] args) {
+        log.info("Bibernate Demo Application...");
+        Persistent persistent = Persistent.withDefaultConfiguration(ENTITY_PACKAGE);
+
+        try (var bibernateEntityManager = persistent.createBibernateEntityManager()) {
+            var bibernateSessionFactory = bibernateEntityManager.getBibernateSessionFactory();
+            try (var session = bibernateSessionFactory.openSession()) {
+                var course = new Course();
+                course.setName("Course_name1");
+
+                Course savedCourse = session.save(Course.class, course);
+
+                var person = new Person();
+                person.setFirstName("Yevgen");
+                person.getCourses().add(savedCourse);
+
+                Person savedPerson = session.save(Person.class, person);
+
+                List<Course> courses = savedPerson.getCourses();
+                log.info("Person {} courses {}", person, Arrays.toString(courses.toArray()));
+            }
+        }
+    }
+}
+
+```
+
+
+logs from demo applications
+
+```bash
+22:12:41.674 [main] INFO  c.l.b.demo.ManyToManyDemoApplication - Person Person(id=null, firstName=Yevgen, lastName=null, address=null) courses [Course(id=null, name=Course_name1, persons=[], author=null)]
+22:12:41.674 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Session is closing. Performing dirty checking...
+22:12:41.678 [main] DEBUG i.g.b.b.d.j.i.SequenceIdGenerator - Generating ID for entityClass class com.levik.bibernate.demo.relations.Course
+22:12:41.679 [main] DEBUG i.g.b.b.d.j.i.SequenceIdGenerator - Query select nextval('courses_id_seq');
+22:12:41.685 [main] DEBUG i.g.b.b.d.j.i.SequenceIdGenerator - Next ID:[1] was fetched from db for sequence:[courses_id_seq]
+22:12:41.689 [main] DEBUG i.g.b.b.d.j.i.SequenceIdGenerator - Query INSERT INTO courses ( id, name ) VALUES ( ?, ? );
+22:12:41.690 [main] TRACE i.g.b.bibernate.dao.EntityDao - Save entity clazz Course
+22:12:41.690 [main] DEBUG i.g.b.b.d.j.i.IdentityIdGenerator - Query INSERT INTO persons ( first_name, last_name, person_address_id ) VALUES ( ?, ?, ? );
+22:12:41.694 [main] DEBUG i.g.b.b.d.j.i.AbstractGenerator - Query INSERT INTO persons_courses ( person_id, course_id ) VALUES ( ?, ? );
+22:12:41.696 [main] TRACE i.g.b.bibernate.dao.EntityDao - Save entity clazz Person
+22:12:41.697 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - FirstLevelCache is clearing...
+22:12:41.697 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Snapshots are clearing...
+```
 
 
 
