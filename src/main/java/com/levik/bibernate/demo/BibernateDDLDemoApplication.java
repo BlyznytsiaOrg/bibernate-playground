@@ -9,15 +9,6 @@ public class BibernateDDLDemoApplication {
 
     public static void main(String[] args) {
         log.info("Bibernate Demo Application...");
-        var persistent = Persistent.withDefaultConfiguration(ENTITY_PACKAGE);
-
-        try(var bibernateEntityManager = persistent.createBibernateEntityManager()) {
-
-            try (var bibernateSessionFactory = bibernateEntityManager.getBibernateSessionFactory()) {
-                try (var bibernateSession = bibernateSessionFactory.openSession()){
-
-                }
-            }
-        }
+        Persistent.withDefaultConfiguration(ENTITY_PACKAGE);
     }
 }
