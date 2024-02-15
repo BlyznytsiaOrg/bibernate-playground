@@ -9,6 +9,7 @@
  - **Automatic Persistence and optimization**
  - **Transaction Management**
  - **Relations**
+ - **Versioning**
 
 Please take into account that this is not a full supported features it is just for demo set. 
 If you need more please take to look into example of repo [bibernate](https://github.com/BlyznytsiaOrg/bibernate).
@@ -46,7 +47,7 @@ com.levik.bibernate.demo.BibernateDDLDemoApplication
 
 - **annotation check during compile face**
 
-Imagine you've recently started learning Hibernate, but you've forgotten to include a crucial annotation in one of your entity classes. 
+Imagine you've recently started learning Bibernate, but you've forgotten to include a crucial annotation in one of your entity classes. 
 Time is of the essence, so it's vital to identify and resolve any errors quickly. 
 Due to our focus on efficiency, encountering compile errors in this scenario is expected.
 
@@ -70,7 +71,6 @@ public class Person {
 ```
 
 In this scenario, you'll encounter compile errors that come with clear instructions on how to resolve them. Isn't that convenient?
-Isn't that convenient?
 
 <img width="1300" alt="image" src="https://github.com/BlyznytsiaOrg/bring/assets/73576438/b35b7a12-7403-4ef7-b768-de43dfe26ed5">
 
@@ -78,7 +78,7 @@ We have many more check please refer [bibernate annotation check]()
 
 - **Schema Generation** (Offers tools for generating database schemas based on entity mappings, simplifying database setup and migration.)
 
-To enable this feature in Bibernate, you need to create a hibernate.properties file with the following configuration settings.
+To enable this feature in Bibernate, you need to create a bibernate.properties file with the following configuration settings.
 
 ```bash
 bibernate.2ddl.auto=create
@@ -189,7 +189,7 @@ public class BibernateDDLDemoApplication {
 }
 ```
 
-The default logging level in Hibernate is INFO. To enable a lower level of logging, use a logback.xml configuration file.
+The default logging level in Bibernate is INFO. To enable a lower level of logging, use a logback.xml configuration file.
 Here's an example of configuring trace logging:
 
 ```bash
@@ -547,6 +547,10 @@ logs from demo applications
 22:12:41.697 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Snapshots are clearing...
 ```
 
+
+- **Versioning**
+
+Supports versioning of entity data and implementing optimistic concurrency control.
 
 
 
