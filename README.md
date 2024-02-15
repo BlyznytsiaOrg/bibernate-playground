@@ -4,22 +4,22 @@
 
 # Demo features:
 
- - **Annotation check during compile face**
+ - **Annotation Check during Compile Face**
  - **Schema Generation**
  - **Automatic Persistence and optimization**
  - **Transaction Management**
  - **Relations**
 
 Please take into account that this is not a full supported features it is just for demo set. 
-If you need more please take to look into example of repo [bibernate](https://github.com/BlyznytsiaOrg/bibernate).
+If you need more please take to look into example of the [Bibernate](https://github.com/BlyznytsiaOrg/bibernate) repo.
 
 ## Prerequisites
 
-Before getting started with Bibernate, ensure you have the following prerequisites installed:
+Before getting started with *the Bibernate*, ensure you have the following prerequisites installed:
 
 - Java 17
 - Your preferred Java IDE such as IntelliJ IDEA
-- Docker or PostgreSQL
+- Docker or PostgresSQL
 
 ## Usage
 
@@ -29,7 +29,7 @@ To run the `Bibernate Playground` application:
 ```bash
    git clone git@github.com:BlyznytsiaOrg/bibernate.git
 ```  
-- 2. Run docker-compose to start the PostgreSQL or skip if you have local one (db.url=jdbc:postgresql://localhost:5432/db).
+- Run docker-compose to start the PostgreSQL or skip if you have local one (db.url=jdbc:postgresql://localhost:5432/db).
 
 ```bash
    cd docker 
@@ -42,15 +42,15 @@ To run the `Bibernate Playground` application:
 com.levik.bibernate.demo.BibernateDDLDemoApplication
 ```  
 
-## Let's go feature by feature
+## Let's go Feature by Feature
 
-- **annotation check during compile face**
+- **Annotation Check during Compile Face**
 
-Imagine you've recently started learning Hibernate, but you've forgotten to include a crucial annotation in one of your entity classes. 
+Imagine you've recently started learning *the Bibernate*, but you've forgotten to include a crucial annotation in one of your entity classes. 
 Time is of the essence, so it's vital to identify and resolve any errors quickly. 
 Due to our focus on efficiency, encountering compile errors in this scenario is expected.
 
-We have simple entity, but we forget to add @Id annotation.
+We have simple entity, but we forget to add `@Id` annotation.
 
 ```java
 import io.github.blyznytsiaorg.bibernate.annotation.Entity;
@@ -70,15 +70,16 @@ public class Person {
 ```
 
 In this scenario, you'll encounter compile errors that come with clear instructions on how to resolve them. Isn't that convenient?
-Isn't that convenient?
 
 <img width="1300" alt="image" src="https://github.com/BlyznytsiaOrg/bring/assets/73576438/b35b7a12-7403-4ef7-b768-de43dfe26ed5">
 
-We have many more check please refer [bibernate annotation check]()
+We have many more check please refer [Bibernate Annotation check]()
 
-- **Schema Generation** (Offers tools for generating database schemas based on entity mappings, simplifying database setup and migration.)
+- **Schema Generation** 
 
-To enable this feature in Bibernate, you need to create a hibernate.properties file with the following configuration settings.
+Offers tools for generating database schemas based on entity mappings, simplifying database setup and migration
+
+To enable this feature in *the Bibernate*, you need to create a `hibernate.properties` file with the following configuration settings.
 
 ```bash
 bibernate.2ddl.auto=create
@@ -161,12 +162,13 @@ public class Phone {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "phone_gen")
     @SequenceGenerator(name = "phone_gen", sequenceName = "phone_seq",
             initialValue = 10, allocationSize = 20)
-    @Column(name = "id")
     private Long id;
 
     @Column(unique = true, nullable = false)
     private String mobileNumber;
+    
     private String companyNumber;
+    
     @ManyToOne
     @JoinColumn(name = "author_profile_id", foreignKey = @ForeignKey(name = "FK_phone_author_profile"))
     private AuthorProfile authorProfile;
@@ -189,7 +191,7 @@ public class BibernateDDLDemoApplication {
 }
 ```
 
-The default logging level in Hibernate is INFO. To enable a lower level of logging, use a logback.xml configuration file.
+The default logging level in *the Bibernate* is INFO. To enable a lower level of logging, use a logback.xml configuration file.
 Here's an example of configuring trace logging:
 
 ```bash
@@ -210,9 +212,9 @@ Here's an example of configuring trace logging:
 </configuration>
 ```
 
-I'd like to highlight a few useful items in the logs.
+We would like to highlight a few useful items in the logs.
 
-- We utilize the EntityMetadataCollector class to gather all entities using reflection, and subsequently utilize the collected data. 
+- *The Bibernate* use the `EntityMetadataCollector` class to gather all entities using reflection and subsequently utilize the collected data. 
 Then print the number of entities found. If you don't have any entities you will see and errors.
 
 ```bash
@@ -224,7 +226,7 @@ at io.github.blyznytsiaorg.bibernate.Persistent.withDefaultConfiguration(Persist
 at com.levik.bibernate.demo.BibernateDDLDemoApplication.main(BibernateDDLDemoApplication.java:13)
 ```
 
-- DDL operation. If you're new to DDL (Data Definition Language), you could write some entities and learn DDL syntax.
+- DDL (Data Definition Language) operations. If you're new to DDL, you could write some entities and learn DDL syntax.
 
 ```bash
 20:29:15.035 [main] DEBUG i.g.b.bibernate.ddl.DDLProcessor - Bibernate: alter table if exists phone drop constraint if exists FK_phone_author_profile
@@ -253,7 +255,7 @@ at com.levik.bibernate.demo.BibernateDDLDemoApplication.main(BibernateDDLDemoApp
 20:29:15.100 [main] DEBUG i.g.b.bibernate.ddl.DDLProcessor - Bibernate: alter table if exists author_profiles add constraint FK_rnww79asjwzd foreign key(author_id) references authors
 ```
 
-This is the main part. If you require further information, please feel free to refer to the logs. Bibernate strives to guide you through any issues encountered.
+If you require further information, please feel free to refer to the logs. Bibernate strives to guide you through any issues encountered.
 
 ```bash
 20:29:14.992 [main] INFO  org.reflections.Reflections - Reflections took 37 ms to scan 2 urls, producing 32 keys and 157 values
@@ -261,7 +263,7 @@ This is the main part. If you require further information, please feel free to r
 20:29:15.006 [main] TRACE i.g.b.b.e.m.EntityMetadataCollector - Found entities size 4
 ```
 
-For more example refer our tests
+For more example refer tests
 
 
 - **Automatic Persistence and optimization**
@@ -275,7 +277,7 @@ For instance
 2. update it with a new name -> update
 3. and delete it.
 
-Bibernate will intelligently analyze these actions and execute only the final action, which is the delete operation. 
+*The Bibernate* will analyze these actions and execute only the final action, which is the delete operation. 
 This optimization enhances efficiency and streamlines database interactions.
 
 
@@ -310,7 +312,7 @@ public class ActionQueueOptimizationDemoApplication {
 }
 ```
 
-logs result and we have just delete query. This optimization significantly reduces database overhead and enhances performance.
+Logs result shows and we have just delete query. This optimization reduces database overhead and enhances performance.
 
 ```bash
 23:24:32.040 [main] DEBUG i.g.b.bibernate.dao.EntityDao - Query DELETE FROM persons WHERE id = ?; bindValue id=2
@@ -318,8 +320,8 @@ logs result and we have just delete query. This optimization significantly reduc
 ```
 
 If you need more detailed examples and cases regarding the behavior of the action queue and session optimization, 
-you can refer to either the ActionQueueTest within our test suite or the official documentation. 
-The test cases in ActionQueueTest cover various scenarios and edge cases, providing insights into how the action 
+you can refer to either the `ActionQueueTest` within our test suite or the official documentation. 
+The test cases in `ActionQueueTest` cover various scenarios and edge cases, providing insights into how the action 
 queue behaves under different conditions. Additionally, the documentation should offer explanations and examples to 
 help you understand how the session optimization feature works and how to utilize it effectively in your applications.
 
@@ -330,14 +332,11 @@ Offers built-in support for managing database transactions, ensuring data integr
 
 We have a simple Entity with ID -> Identity
 
-@Entity: This annotation marks the class as an entity, indicating that it will be mapped to a database table. In this case, the Person class represents a table named "persons" in the database.
-@Table(name = "persons"): This annotation specifies the name of the database table to which the entity is mapped. In this case, the Person class will be mapped to a table named "persons".
-
-@Id: This annotation marks the field that represents the primary key of the entity. In this case, the id field is the primary key.
-
-@GeneratedValue(strategy = GenerationType.IDENTITY): This annotation specifies the generation strategy for the primary key values. IDENTITY indicates that the database will automatically generate unique primary key values. This is typically used with databases that support auto-increment columns.
-
-@Column(name = "column_name"): This annotation specifies the mapping of the entity's field to the corresponding column in the database table. It allows you to customize the column name if it differs from the field name. In this case, firstName and lastName fields are mapped to columns named "first_name" and "last_name" in the "persons" table, respectively.
+`@Entity`: This annotation marks the class as an entity, indicating that it will be mapped to a database table. In this case, the Person class represents a table named "persons" in the database.
+`@Table(name = "persons")`: This annotation specifies the name of the database table to which the entity is mapped. In this case, the Person class will be mapped to a table named "persons".
+`@Id`: This annotation marks the field that represents the primary key of the entity. In this case, the id field is the primary key.
+`@GeneratedValue(strategy = GenerationType.IDENTITY)`: This annotation specifies the generation strategy for the primary key values. IDENTITY indicates that the database will automatically generate unique primary key values. This is typically used with databases that support auto-increment columns.
+`@Column(name = "column_name")`: This annotation specifies the mapping of the entity's field to the corresponding column in the database table. It allows you to customize the column name if it differs from the field name. In this case, firstName and lastName fields are mapped to columns named "first_name" and "last_name" in the "persons" table, respectively.
 
 
 ```java
@@ -430,7 +429,7 @@ After reviewing the output, we observe that only one insertion into the 'person'
 
 - **Relations**
 
-Let's delve into configuring a many-to-many relationship between two entities, namely Person and Course.
+Let's delve into configuring a Many-to-Many relationship between two entities, namely Person and Course.
 
 
 ```java
@@ -558,7 +557,7 @@ logs from demo applications
 
 
 
-Furthermore, Biberate accommodates a plethora of additional features.:
+Furthermore, *the Bibernate* accommodates a plethora of additional features:
 
 
 
