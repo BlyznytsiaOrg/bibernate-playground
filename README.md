@@ -552,17 +552,35 @@ logs from demo applications
 
 Supports versioning of entity data and implementing optimistic concurrency control.
 
+The versioning feature in Bibernate allows for the management of entity data versions, enabling optimistic concurrency control.
+This feature is crucial for applications handling concurrent access to data, ensuring data integrity and consistency.
 
 
+- Entity Versioning
+   Entities in Bibernate can be annotated with a version attribute, which automatically tracks changes to the entity.
+   This version attribute is updated whenever the entity is modified.
 
 
+```java
+@Getter
+@Setter
+@Entity
+@Table(name = "employees")
+public class EmployeeEntity {
+    @Id
+    private Long id;
+
+    private String firstName;
+
+    private String lastName;
+
+    @Version
+    private Integer version;
+}
+```
 
 
-
-
-
-
-Furthermore, Biberate accommodates a plethora of additional features.:
+for more example look into test OptimisticVersionUserTest.
 
 
 
