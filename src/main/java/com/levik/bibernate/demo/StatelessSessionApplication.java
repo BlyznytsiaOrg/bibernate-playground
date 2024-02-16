@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Slf4j
-public class StatelessSession {
+public class StatelessSessionApplication {
     public static final String ENTITY_PACKAGE = "com.levik.bibernate.demo.statelesssession";
 
     public static void main(String[] args) {
