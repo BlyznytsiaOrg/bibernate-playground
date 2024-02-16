@@ -4,23 +4,25 @@
 
 # Demo features:
 
- - **Annotation check during compile face**
+ - **Annotation Check during Compile Face**
  - **Schema Generation**
+ - **Flyway Migration Support**
  - **Automatic Persistence and optimization**
  - **Transaction Management**
  - **Relations**
  - **Versioning**
+ - **Stateless Session**
 
 Please take into account that this is not a full supported features it is just for demo set. 
-If you need more please take to look into example of repo [bibernate](https://github.com/BlyznytsiaOrg/bibernate).
+If you need more please take to look into example of the [Bibernate](https://github.com/BlyznytsiaOrg/bibernate) repo.
 
 ## Prerequisites
 
-Before getting started with Bibernate, ensure you have the following prerequisites installed:
+Before getting started with *the Bibernate*, ensure you have the following prerequisites installed:
 
 - Java 17
 - Your preferred Java IDE such as IntelliJ IDEA
-- Docker or PostgreSQL
+- Docker or PostgresSQL
 
 ## Usage
 
@@ -30,28 +32,23 @@ To run the `Bibernate Playground` application:
 ```bash
    git clone git@github.com:BlyznytsiaOrg/bibernate.git
 ```  
-- 2. Run docker-compose to start the PostgreSQL or skip if you have local one (db.url=jdbc:postgresql://localhost:5432/db).
+- Run docker-compose to start the PostgreSQL or skip if you have local one (db.url=jdbc:postgresql://localhost:5432/db).
 
 ```bash
    cd docker 
    docker-compose up -d
 ```
 
-- Run demo application
 
-```
-com.levik.bibernate.demo.BibernateDDLDemoApplication
-```  
+## Let's go Feature by Feature
 
-## Let's go feature by feature
+- **Annotation Check during Compile Face**
 
-- **annotation check during compile face**
-
-Imagine you've recently started learning Bibernate, but you've forgotten to include a crucial annotation in one of your entity classes. 
+Imagine you've recently started learning *the Bibernate*, but you've forgotten to include a crucial annotation in one of your entity classes. 
 Time is of the essence, so it's vital to identify and resolve any errors quickly. 
 Due to our focus on efficiency, encountering compile errors in this scenario is expected.
 
-We have simple entity, but we forget to add @Id annotation.
+We have simple entity, but we forget to add `@Id` annotation.
 
 ```java
 import io.github.blyznytsiaorg.bibernate.annotation.Entity;
@@ -74,13 +71,15 @@ In this scenario, you'll encounter compile errors that come with clear instructi
 
 <img width="1300" alt="image" src="https://github.com/BlyznytsiaOrg/bring/assets/73576438/b35b7a12-7403-4ef7-b768-de43dfe26ed5">
 
-We have many more check please refer [bibernate annotation check]()
+We have many more check please refer [Bibernate Annotation check]()
 
-- **Schema Generation** (Offers tools for generating database schemas based on entity mappings, simplifying database setup and migration.)
+- **Schema Generation** 
 
-To enable this feature in Bibernate, you need to create a bibernate.properties file with the following configuration settings.
+Offers a tool for generating database schemas based on entity mappings, simplifying database setup and migration.
 
-```bash
+To enable this feature in *the Bibernate*, you need to create a `bibernate.properties` file with the following configuration settings.
+
+```properties
 bibernate.2ddl.auto=create
 ```
 
@@ -161,12 +160,13 @@ public class Phone {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "phone_gen")
     @SequenceGenerator(name = "phone_gen", sequenceName = "phone_seq",
             initialValue = 10, allocationSize = 20)
-    @Column(name = "id")
     private Long id;
 
     @Column(unique = true, nullable = false)
     private String mobileNumber;
+    
     private String companyNumber;
+    
     @ManyToOne
     @JoinColumn(name = "author_profile_id", foreignKey = @ForeignKey(name = "FK_phone_author_profile"))
     private AuthorProfile authorProfile;
@@ -189,10 +189,12 @@ public class BibernateDDLDemoApplication {
 }
 ```
 
-The default logging level in Bibernate is INFO. To enable a lower level of logging, use a logback.xml configuration file.
+run `BibernateDDLDemoApplication`
+
+The default logging level in *the Bibernate* is INFO. To enable a lower level of logging, use a logback.xml configuration file.
 Here's an example of configuring trace logging:
 
-```bash
+```log
 <configuration>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -210,12 +212,12 @@ Here's an example of configuring trace logging:
 </configuration>
 ```
 
-I'd like to highlight a few useful items in the logs.
+We would like to highlight a few useful items in the logs.
 
-- We utilize the EntityMetadataCollector class to gather all entities using reflection, and subsequently utilize the collected data. 
+- *The Bibernate* use the `EntityMetadataCollector` class to gather all entities using reflection and subsequently utilize the collected data. 
 Then print the number of entities found. If you don't have any entities you will see and errors.
 
-```bash
+```log
 15:56:42.588 [main] TRACE i.g.b.b.e.m.EntityMetadataCollector - Found entities size 0
 Exception in thread "main" io.github.blyznytsiaorg.bibernate.exception.EntitiesNotFoundException: Cannot find any entities on classpath with this package com.levik.bibernate.demo.entity
 at io.github.blyznytsiaorg.bibernate.entity.metadata.EntityMetadataCollector.collectMetadata(EntityMetadataCollector.java:80)
@@ -224,9 +226,9 @@ at io.github.blyznytsiaorg.bibernate.Persistent.withDefaultConfiguration(Persist
 at com.levik.bibernate.demo.BibernateDDLDemoApplication.main(BibernateDDLDemoApplication.java:13)
 ```
 
-- DDL operation. If you're new to DDL (Data Definition Language), you could write some entities and learn DDL syntax.
+- DDL (Data Definition Language) operations. If you're new to DDL, you could write some entities and learn DDL syntax.
 
-```bash
+```log
 20:29:15.035 [main] DEBUG i.g.b.bibernate.ddl.DDLProcessor - Bibernate: alter table if exists phone drop constraint if exists FK_phone_author_profile
 20:29:15.035 [main] DEBUG i.g.b.bibernate.ddl.DDLProcessor - Bibernate: alter table if exists books_authors drop constraint if exists FK_book_book_authors
 20:29:15.035 [main] DEBUG i.g.b.bibernate.ddl.DDLProcessor - Bibernate: alter table if exists books_authors drop constraint if exists FK_authors_book_authors
@@ -253,15 +255,76 @@ at com.levik.bibernate.demo.BibernateDDLDemoApplication.main(BibernateDDLDemoApp
 20:29:15.100 [main] DEBUG i.g.b.bibernate.ddl.DDLProcessor - Bibernate: alter table if exists author_profiles add constraint FK_rnww79asjwzd foreign key(author_id) references authors
 ```
 
-This is the main part. If you require further information, please feel free to refer to the logs. Bibernate strives to guide you through any issues encountered.
+If you require further information, please feel free to refer to the logs. Bibernate strives to guide you through any issues encountered.
 
-```bash
+```log
 20:29:14.992 [main] INFO  org.reflections.Reflections - Reflections took 37 ms to scan 2 urls, producing 32 keys and 157 values
 20:29:15.004 [main] INFO  org.reflections.Reflections - Reflections took 4 ms to scan 1 urls, producing 2 keys and 7 values
 20:29:15.006 [main] TRACE i.g.b.b.e.m.EntityMetadataCollector - Found entities size 4
 ```
 
-For more example refer our tests
+For more example refer tests
+
+- **Flyway Migration Support**
+
+Integrates seamlessly with Flyway migration tool, enabling database schema management and version control through declarative SQL migration scripts. 
+
+- create own config file with following properties:
+```properties
+db.url=jdbc:postgresql://localhost:5432/db
+db.user=user
+db.password=password
+db.maxPoolSize=10
+bibernate.flyway.enabled=true
+```
+- write migration scripts in db.migration folder
+```sql
+CREATE TABLE IF NOT EXISTS persons (
+                                       id bigserial primary key,
+                                       first_name varchar(255),
+                                       last_name varchar(255)
+    );
+```
+run `FlywayMigrationSupportApplication`
+
+```java
+@Slf4j
+public class FlywayMigrationSupportApplication {
+    public static final String ENTITY_PACKAGE = "com.levik.bibernate.demo.flyway";
+    public static final String CONFIG_FILE_NAME = "bibernate-flyway.properties";
+    @SneakyThrows
+    public static void main(String[] args) {
+        log.info("Bibernate Demo Application...");
+        Persistent persistent = Persistent.withExternalConfiguration(ENTITY_PACKAGE, CONFIG_FILE_NAME);
+
+        try (var bibernateEntityManager = persistent.createBibernateEntityManager()) {
+            var bibernateSessionFactory = bibernateEntityManager.getBibernateSessionFactory();
+            try (var session = bibernateSessionFactory.openSession()) {
+                var person = new Person();
+                person.setFirstName("Gavin");
+                person.setLastName("King");
+
+                session.save(Person.class, person);
+
+                Person savedPerson = session.findById(Person.class, 1L).orElseThrow();
+                log.info("Person {} ",savedPerson);
+            }
+        }
+    }
+}
+```
+You will observe in the logs that the table is created and subsequent save operations can be performed: 
+
+```log
+7:18.745 [main] INFO  org.flywaydb.core.FlywayExecutor - Database: jdbc:postgresql://localhost:5432/db (PostgreSQL 15.3)
+21:57:18.818 [main] INFO  o.f.core.internal.command.DbValidate - Successfully validated 1 migration (execution time 00:00.039s)
+21:57:18.882 [main] INFO  o.f.core.internal.command.DbMigrate - Current version of schema "public": 1
+21:57:18.885 [main] INFO  o.f.core.internal.command.DbMigrate - Schema "public" is up to date. No migration necessary.
+21:57:18.935 [main] TRACE i.g.b.bibernate.dao.EntityDao - Save entity clazz Person
+21:57:18.937 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Entity Person not found in firstLevel cache by id 1
+21:57:18.969 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Created snapshot for entity Person id 1
+21:57:18.970 [main] INFO  c.l.b.d.FlywayMigrationSupportApplication - Person Person(id=1, firstName=Gavin, lastName=King) 
+```
 
 
 - **Automatic Persistence and optimization**
@@ -275,9 +338,10 @@ For instance
 2. update it with a new name -> update
 3. and delete it.
 
-Bibernate will intelligently analyze these actions and execute only the final action, which is the delete operation. 
+*The Bibernate* will analyze these actions and execute only the final action, which is the delete operation. 
 This optimization enhances efficiency and streamlines database interactions.
 
+run `ActionQueueOptimizationDemoApplication`
 
 ```java
 public class ActionQueueOptimizationDemoApplication {
@@ -310,16 +374,16 @@ public class ActionQueueOptimizationDemoApplication {
 }
 ```
 
-logs result and we have just delete query. This optimization significantly reduces database overhead and enhances performance.
+Logs result shows and we have just delete query. This optimization reduces database overhead and enhances performance.
 
-```bash
+```log
 23:24:32.040 [main] DEBUG i.g.b.bibernate.dao.EntityDao - Query DELETE FROM persons WHERE id = ?; bindValue id=2
 23:24:32.050 [main] TRACE i.g.b.bibernate.dao.EntityDao - Delete entity Person with id=2
 ```
 
 If you need more detailed examples and cases regarding the behavior of the action queue and session optimization, 
-you can refer to either the ActionQueueTest within our test suite or the official documentation. 
-The test cases in ActionQueueTest cover various scenarios and edge cases, providing insights into how the action 
+you can refer to either the `ActionQueueTest` within our test suite or the official documentation. 
+The test cases in `ActionQueueTest` cover various scenarios and edge cases, providing insights into how the action 
 queue behaves under different conditions. Additionally, the documentation should offer explanations and examples to 
 help you understand how the session optimization feature works and how to utilize it effectively in your applications.
 
@@ -330,14 +394,11 @@ Offers built-in support for managing database transactions, ensuring data integr
 
 We have a simple Entity with ID -> Identity
 
-@Entity: This annotation marks the class as an entity, indicating that it will be mapped to a database table. In this case, the Person class represents a table named "persons" in the database.
-@Table(name = "persons"): This annotation specifies the name of the database table to which the entity is mapped. In this case, the Person class will be mapped to a table named "persons".
-
-@Id: This annotation marks the field that represents the primary key of the entity. In this case, the id field is the primary key.
-
-@GeneratedValue(strategy = GenerationType.IDENTITY): This annotation specifies the generation strategy for the primary key values. IDENTITY indicates that the database will automatically generate unique primary key values. This is typically used with databases that support auto-increment columns.
-
-@Column(name = "column_name"): This annotation specifies the mapping of the entity's field to the corresponding column in the database table. It allows you to customize the column name if it differs from the field name. In this case, firstName and lastName fields are mapped to columns named "first_name" and "last_name" in the "persons" table, respectively.
+`@Entity`: This annotation marks the class as an entity, indicating that it will be mapped to a database table. In this case, the Person class represents a table named "persons" in the database.
+`@Table(name = "persons")`: This annotation specifies the name of the database table to which the entity is mapped. In this case, the Person class will be mapped to a table named "persons".
+`@Id`: This annotation marks the field that represents the primary key of the entity. In this case, the id field is the primary key.
+`@GeneratedValue(strategy = GenerationType.IDENTITY)`: This annotation specifies the generation strategy for the primary key values. IDENTITY indicates that the database will automatically generate unique primary key values. This is typically used with databases that support auto-increment columns.
+`@Column(name = "column_name")`: This annotation specifies the mapping of the entity's field to the corresponding column in the database table. It allows you to customize the column name if it differs from the field name. In this case, firstName and lastName fields are mapped to columns named "first_name" and "last_name" in the "persons" table, respectively.
 
 
 ```java
@@ -361,6 +422,7 @@ public class Person {
 
 Demo application for this 
 
+run `BibernateTransactionDemoApplication`
 
 ```java
 @Slf4j
@@ -402,10 +464,11 @@ public class BibernateTransactionDemoApplication {
 }
 ```
 
+
 result of the program output
 
 
-```bash
+```log
 21:26:19.513 [main] TRACE i.g.b.b.e.m.EntityMetadataCollector - Found entities size 1
 21:26:19.525 [main] DEBUG i.g.b.bibernate.ddl.DDLProcessor - Bibernate: drop table if exists persons cascade
 21:26:19.536 [main] DEBUG i.g.b.bibernate.ddl.DDLProcessor - Bibernate: create table persons (id bigserial primary key, first_name varchar(255), last_name varchar(255))
@@ -430,7 +493,7 @@ After reviewing the output, we observe that only one insertion into the 'person'
 
 - **Relations**
 
-Let's delve into configuring a many-to-many relationship between two entities, namely Person and Course.
+Let's delve into configuring a Many-to-Many relationship between two entities, namely Person and Course.
 
 
 ```java
@@ -494,6 +557,7 @@ public class Course {
 
 The demo application looks like this 
 
+run `ManyToManyDemoApplication`
 
 ```java
 @Slf4j
@@ -530,9 +594,10 @@ public class ManyToManyDemoApplication {
 ```
 
 
+
 logs from demo applications
 
-```bash
+```log
 22:12:41.674 [main] INFO  c.l.b.demo.ManyToManyDemoApplication - Person Person(id=null, firstName=Yevgen, lastName=null, address=null) courses [Course(id=null, name=Course_name1, persons=[], author=null)]
 22:12:41.674 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Session is closing. Performing dirty checking...
 22:12:41.678 [main] DEBUG i.g.b.b.d.j.i.SequenceIdGenerator - Generating ID for entityClass class com.levik.bibernate.demo.relations.Course
@@ -557,7 +622,7 @@ This feature is crucial for applications handling concurrent access to data, ens
 
 
 - Entity Versioning
-   Entities in Bibernate can be annotated with a version attribute, which automatically tracks changes to the entity.
+   Entities in *the Bibernate* can be annotated with a version attribute, which automatically tracks changes to the entity.
    This version attribute is updated whenever the entity is modified.
 
 
@@ -579,8 +644,66 @@ public class EmployeeEntity {
 }
 ```
 
-
 for more example look into test OptimisticVersionUserTest.
 
+
+- **Stateless Session**
+
+*The Bibernate* provides the ability to retrieve the StatelessSession class, which does not utilize the first-level cache and provides access to the DataSource. 
+Subsequently, the JDBC API can be utilized to interact with the data.
+
+run `StatelessSession`
+
+```java
+@Slf4j
+public class StatelessSession {
+   public static final String ENTITY_PACKAGE = "com.levik.bibernate.demo.statelesssession";
+
+   public static void main(String[] args) {
+      var persistent = Persistent.withDefaultConfiguration(ENTITY_PACKAGE);
+
+      var statelessSession = persistent.createStatelessSession();
+      TransactionalDatasource dataSource = statelessSession.getDataSource();
+      String saveQuery = "insert into persons (first_name, last_name) values ('Martin', 'Fowler')";
+      String selectQuery = "select * from persons p where p.id = 1";
+      try (var connection = dataSource.getConnection()) {
+         try (var statement = connection.prepareStatement(saveQuery)) {
+            statement.executeUpdate();
+         }
+         try (var statement = connection.prepareStatement(selectQuery)) {
+            ResultSet resultSet = statement.executeQuery();
+            Person person = new Person();
+            while (resultSet.next()) {
+               person.setId(resultSet.getLong("id"));
+               person.setFirstName(resultSet.getString("first_name"));
+               person.setLastName(resultSet.getString("last_name"));
+            }
+            log.info("Person {} ", person);
+         }
+      } catch (SQLException e) {
+         throw new RuntimeException("Can't get the connection", e);
+      }
+   }
+}
+```
+logs from demo applications
+
+```log
+23:15:35.962 [main] TRACE i.g.b.b.c.BibernateDatabaseSettings - Creating dataSource...
+23:15:35.968 [main] DEBUG i.g.b.b.c.BibernateDataSource - Starting Bibernate Datasource ...
+23:15:37.643 [main] DEBUG i.g.b.b.c.BibernateDataSource - Connection Pool size: 20
+23:15:37.643 [main] DEBUG i.g.b.b.c.BibernateDataSource - Start completed Bibernate Datasource ...
+23:15:37.796 [main] INFO  org.reflections.Reflections - Reflections took 129 ms to scan 2 urls, producing 32 keys and 159 values
+23:15:37.833 [main] INFO  org.reflections.Reflections - Reflections took 10 ms to scan 1 urls, producing 2 keys and 2 values
+23:15:37.838 [main] TRACE i.g.b.b.e.m.EntityMetadataCollector - Found entities size 1
+23:15:37.890 [main] DEBUG i.g.b.bibernate.ddl.DDLProcessor - Bibernate: drop table if exists persons cascade
+23:15:37.921 [main] DEBUG i.g.b.bibernate.ddl.DDLProcessor - Bibernate: create table persons (id bigserial primary key, first_name varchar(255), last_name varchar(255))
+23:15:37.967 [main] DEBUG i.g.b.b.c.BibernateConfiguration - Load Property file bibernate.properties
+23:15:37.968 [main] TRACE i.g.b.b.c.BibernateDatabaseSettings - Creating dataSource...
+23:15:37.968 [main] DEBUG i.g.b.b.c.BibernateDataSource - Starting Bibernate Datasource ...
+23:15:38.911 [main] DEBUG i.g.b.b.c.BibernateDataSource - Connection Pool size: 20
+23:15:38.911 [main] DEBUG i.g.b.b.c.BibernateDataSource - Start completed Bibernate Datasource ...
+23:15:38.943 [main] INFO  c.l.bibernate.demo.StatelessSession - Person Person(id=1, firstName=Martin, lastName=Fowler) 
+```
 
 
