@@ -7,7 +7,7 @@
  - **Annotation Check during Compile Face**
  - **Schema Generation**
  - **Flyway Migration Support**
- - **Automatic Persistence and optimization**
+ - **Automatic Persistence and Optimization**
  - **Transaction Management**
  - **Relations**
  - **Versioning**
@@ -71,7 +71,7 @@ In this scenario, you'll encounter compile errors that come with clear instructi
 
 <img width="1300" alt="image" src="https://github.com/BlyznytsiaOrg/bring/assets/73576438/b35b7a12-7403-4ef7-b768-de43dfe26ed5">
 
-We have many more check please refer [Bibernate Annotation check]()
+We have many more check please refer [Bibernate Annotation check](https://github.com/BlyznytsiaOrg/bibernate/blob/main/features/AnnotationProcessing.md)
 
 - **Schema Generation** 
 
@@ -327,7 +327,7 @@ You will observe in the logs that the table is created and subsequent save opera
 ```
 
 
-- **Automatic Persistence and optimization**
+- **Automatic Persistence and Optimization**
 
 Automatically manages the lifecycle of persistent objects by tracking changes and synchronizing them with the database. 
 An optimization feature is also implemented, where it analyzes all actions performed within a session and optimizes them. 
@@ -420,7 +420,7 @@ public class Person {
 }
 ```
 
-Demo application for this 
+Demo application
 
 run `BibernateTransactionDemoApplication`
 
@@ -465,7 +465,7 @@ public class BibernateTransactionDemoApplication {
 ```
 
 
-result of the program output
+logs from demo applications
 
 
 ```log
@@ -617,7 +617,7 @@ logs from demo applications
 
 Supports versioning of entity data and implementing optimistic concurrency control.
 
-The versioning feature in Bibernate allows for the management of entity data versions, enabling optimistic concurrency control.
+The versioning feature in *the Bibernate* allows for the management of entity data versions, enabling optimistic concurrency control.
 This feature is crucial for applications handling concurrent access to data, ensuring data integrity and consistency.
 
 
@@ -644,15 +644,59 @@ public class EmployeeEntity {
 }
 ```
 
-for more example look into test OptimisticVersionUserTest.
+Demo Application
+run `VersioningApplication`
 
+```java
+@Slf4j
+public class VersioningApplication {
+   public static final String ENTITY_PACKAGE = "com.levik.bibernate.demo.versioning";
+
+   public static void main(String[] args) {
+      var persistent = Persistent.withDefaultConfiguration(ENTITY_PACKAGE);
+      try(var bibernateEntityManager = persistent.createBibernateEntityManager()) {
+
+         try (var bibernateSessionFactory = bibernateEntityManager.getBibernateSessionFactory()) {
+            try (var bibernateSession = bibernateSessionFactory.openSession()){
+               var employeeEntity = new EmployeeEntity();
+               employeeEntity.setId(1L);
+               employeeEntity.setFirstName("Vlad");
+               employeeEntity.setLastName("Mihalcea");
+
+               var saveEmployeeEntity = bibernateSession.save(EmployeeEntity.class, employeeEntity);
+               bibernateSession.flush();
+
+               log.info("Person {} ", saveEmployeeEntity);
+            }
+         }
+      }
+   }
+}
+```
+logs from demo applications
+
+```log
+00:01:41.054 [main] DEBUG i.g.b.bibernate.ddl.DDLProcessor - Bibernate: create table employees (id bigint primary key, first_name varchar(255), last_name varchar(255), version integer)
+00:01:41.114 [main] DEBUG i.g.b.b.d.j.identity.NoneIdGenerator - Query INSERT INTO employees ( id, first_name, last_name, version ) VALUES ( ?, ?, ?, ? );
+00:01:41.115 [main] TRACE i.g.b.bibernate.dao.EntityDao - Save entity clazz EmployeeEntity
+00:01:41.117 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Entity EmployeeEntity not found in firstLevel cache by id 1
+00:01:41.123 [main] DEBUG i.g.b.bibernate.dao.EntityDao - Query SELECT * FROM employees WHERE id = ?; bindValues [1]
+00:01:41.149 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Created snapshot for entity EmployeeEntity id 1
+00:01:41.150 [main] INFO  c.l.b.demo.VersioningApplication - Person EmployeeEntity(id=1, firstName=FirstName2, lastName=LastName2, version=1) 
+00:01:41.153 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Session is closing. Performing dirty checking...
+00:01:41.159 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Dirty entity not found for entityKey EntityKey[clazz=class com.levik.bibernate.demo.versioning.EmployeeEntity, id=1, keyType=class java.lang.Long] no changes
+00:01:41.164 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - FirstLevelCache is clearing...
+00:01:41.165 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Snapshots are clearing...
+00:01:41.165 [main] TRACE i.g.b.b.s.DefaultBibernateSession - Close session...
+```
+the `EmployeeEntity` was created with version = 1
 
 - **Stateless Session**
 
 *The Bibernate* provides the ability to retrieve the StatelessSession class, which does not utilize the first-level cache and provides access to the DataSource. 
 Subsequently, the JDBC API can be utilized to interact with the data.
 
-run `StatelessSession`
+run `StatelessSessionApplication`
 
 ```java
 @Slf4j
