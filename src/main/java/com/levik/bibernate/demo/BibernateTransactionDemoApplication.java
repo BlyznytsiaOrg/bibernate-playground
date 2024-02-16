@@ -2,6 +2,7 @@ package com.levik.bibernate.demo;
 
 import com.levik.bibernate.demo.transaction.Person;
 import io.github.blyznytsiaorg.bibernate.Persistent;
+import io.github.blyznytsiaorg.bibernate.utils.BibernateBanner;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,6 +16,7 @@ public class BibernateTransactionDemoApplication {
     @SneakyThrows
     public static void main(String[] args) {
         log.info("Bibernate Demo Application...");
+        System.setProperty(BibernateBanner.BIBERNATE_BANNER_KEY, "on");
         Persistent persistent = Persistent.withDefaultConfiguration(ENTITY_PACKAGE);
 
         try (var bibernateEntityManager = persistent.createBibernateEntityManager()) {
