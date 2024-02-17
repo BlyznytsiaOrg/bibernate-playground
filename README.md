@@ -390,6 +390,8 @@ queue behaves under different conditions. Additionally, the documentation should
 help you understand how the session optimization feature works and how to utilize it effectively in your applications.
 
 For more information please refer to [Automatic Persistence](https://github.com/BlyznytsiaOrg/bibernate/blob/main/features/AutomaticPersistence.md)
+
+
 - **Transaction Management**
 
 Offers built-in support for managing database transactions, ensuring data integrity and consistency across multiple operations.
