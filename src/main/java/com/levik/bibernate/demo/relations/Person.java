@@ -33,7 +33,7 @@ public class Person {
     private List<Course> courses = new ArrayList<>();
 
     @OneToOne
-    @JoinColumn(name = "persons_address_id")
+    @JoinColumn(name = "person_address_id")
     private Address address;
     
 }
