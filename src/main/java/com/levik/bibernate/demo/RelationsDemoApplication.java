@@ -51,10 +51,9 @@ public class RelationsDemoApplication {
             try (var bibernateSession = bibernateSessionFactory.openSession()) {
                 Optional<User> optionalUser = bibernateSession.findById(User.class, 1L);
                 optionalUser.ifPresent(user -> {
-                    log.info("User's first name {}", user.getFirstName());
-                    log.info("User's last name {}", user.getLastName());
-                    log.info("User's address {}", user.getAddress());
-                    log.info("User's profile {}", user.getProfile());
+                    System.out.println(user.getFirstName() + " " + user.getLastName());
+                    System.out.println(user.getAddress());
+                    System.out.println(user.getProfile());// get lazy field
                 });
             }
         }
