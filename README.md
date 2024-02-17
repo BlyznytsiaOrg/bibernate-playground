@@ -71,7 +71,7 @@ In this scenario, you'll encounter compile errors that come with clear instructi
 
 <img width="1300" alt="image" src="https://github.com/BlyznytsiaOrg/bring/assets/73576438/b35b7a12-7403-4ef7-b768-de43dfe26ed5">
 
-We have many more check please refer [Bibernate Annotation check](https://github.com/BlyznytsiaOrg/bibernate/blob/main/features/AnnotationProcessing.md)
+For more information please refer to [Bibernate Annotation check](https://github.com/BlyznytsiaOrg/bibernate/blob/main/features/AnnotationProcessing.md)
 
 - **Schema Generation** 
 
@@ -173,6 +173,7 @@ public class Phone {
 }
 ```
 
+run `BibernateDDLDemoApplication`
 
 ```java
 import io.github.blyznytsiaorg.bibernate.Persistent;
@@ -189,7 +190,8 @@ public class BibernateDDLDemoApplication {
 }
 ```
 
-run `BibernateDDLDemoApplication`
+For more information please refer to [Schema Generation](https://github.com/BlyznytsiaOrg/bibernate/blob/main/features/SchemaGeneration.md)
+
 
 The default logging level in *the Bibernate* is INFO. To enable a lower level of logging, use a logback.xml configuration file.
 Here's an example of configuring trace logging:
@@ -263,8 +265,6 @@ If you require further information, please feel free to refer to the logs. Biber
 20:29:15.006 [main] TRACE i.g.b.b.e.m.EntityMetadataCollector - Found entities size 4
 ```
 
-For more example refer tests
-
 - **Flyway Migration Support**
 
 Integrates seamlessly with Flyway migration tool, enabling database schema management and version control through declarative SQL migration scripts. 
@@ -325,6 +325,8 @@ You will observe in the logs that the table is created and subsequent save opera
 21:57:18.969 [main] TRACE i.g.b.b.s.BibernateFirstLevelCacheSession - Created snapshot for entity Person id 1
 21:57:18.970 [main] INFO  c.l.b.d.FlywayMigrationSupportApplication - Person Person(id=1, firstName=Gavin, lastName=King) 
 ```
+
+For more information please refer to [Flyway Migration Support](https://github.com/BlyznytsiaOrg/bibernate/blob/main/features/FlywayMigrationSupport.md)
 
 
 - **Automatic Persistence and Optimization**
@@ -387,7 +389,7 @@ The test cases in `ActionQueueTest` cover various scenarios and edge cases, prov
 queue behaves under different conditions. Additionally, the documentation should offer explanations and examples to 
 help you understand how the session optimization feature works and how to utilize it effectively in your applications.
 
-
+For more information please refer to [Automatic Persistence](https://github.com/BlyznytsiaOrg/bibernate/blob/main/features/AutomaticPersistence.md)
 - **Transaction Management**
 
 Offers built-in support for managing database transactions, ensuring data integrity and consistency across multiple operations.
@@ -690,6 +692,8 @@ logs from demo applications
 00:01:41.165 [main] TRACE i.g.b.b.s.DefaultBibernateSession - Close session...
 ```
 the `EmployeeEntity` was created with version = 1
+
+For more information please refer to [Versioning](https://github.com/BlyznytsiaOrg/bibernate/blob/main/features/Versioning.md)
 
 - **Stateless Session**
 
